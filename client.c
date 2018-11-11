@@ -1,34 +1,50 @@
-#include "client.h"
-#include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <arpa/inet.h>
 
 
-int main(int argc, char *argv[])
+int main(int argc , char *argv[])
 {
-	char *host = "localhost"; // target URL
-	char *PORT_NUM = "80"; // port
 
-	char request[0xfff], response[0xfff];
-	char *requestLine = "Get / HTTP/1.1\r\n";
-	char *headerFmt = "Host: %s\r\n";
-	char *CRLF = "\r\n";
+    // Build up socket
+    int sockfd = 0;
+    sockfd = socket(AF_INET , SOCK_STREAM , 0);
 
-	int cfd; // Socket File Descriptor
-	int gaiStatus; // getaddinfo status
-	struct addrinfo hints;
-	struct addrinfo *request; // point to getaddrinfo() result
+    if (sockfd == -1){
+        printf("Fail to create a socket.");
+    }
 
-	// Set up Header Buffer
-	size_t bufferLen = strlen(headerFmt) + strlen(host) + 1;
-	char *buffer = (char *)malloc(bufferLen);
+    // socket connection
 
-	// Set up request message
-	strcpy(request, requestLine);
-	sprintf(buffer, headerFmt, host);
-	strcat(request, buffer);
-	strcat(request, CRLF);
-	printf("%s", request);
-	return 0;
+    struct sockaddr_in info;
+    memset(&info, 0, sizeof(info));
+    info.sin_family = PF_INET;
+
+    // localhost test
+    info.sin_addr.s_addr = inet_addr("127.0.0.1");
+    info.sin_port = htons(80);
+
+
+    int err = connect(sockfd,(struct sockaddr *)&info,sizeof(info));
+    if(err==-1){
+        printf("Connection error");
+    }
+
+
+    //Send a message to server
+    char message[] = {"Hi server"};
+    char receiveMessage[100] = {};
+    send(sockfd,message,sizeof(message),0);
+    recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
+
+    printf("%s",receiveMessage);
+    printf("close Socket\n");
+    close(sockfd);
+    return 0;
 }
 

@@ -6,6 +6,9 @@ CLIENT= client
 
 GIT_HOOKS := .git/hooks/applied
 
+client: $(CLIENT).c
+	$(CC) -o $(CLIENT) $(CCFLAGS)  $(CLIENT).c -lpthread
+
 all: $(GIT_HOOKS)
 	$(CC) -o $(SERVER) $(CCFLAGS)  $(SERVER).c -lpthread
 	$(CC) -o $(CLIENT) $(CCFLAGS)  $(CLIENT).c -lpthread
