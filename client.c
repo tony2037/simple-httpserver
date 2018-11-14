@@ -1,3 +1,4 @@
+#include "client.h"
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -27,7 +28,7 @@ int main(int argc , char *argv[])
 
     // localhost test
     info.sin_addr.s_addr = inet_addr("127.0.0.1");
-    info.sin_port = htons(80);
+    info.sin_port = htons(1234);
 
 
     int err = connect(sockfd,(struct sockaddr *)&info,sizeof(info));

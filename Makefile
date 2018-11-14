@@ -1,10 +1,13 @@
 CC = gcc -std=c99
-CCFLAGS = -Wall -O3
+CCFLAGS = -Wall -O3 -g
 
 SERVER= server
 CLIENT= client
 
 GIT_HOOKS := .git/hooks/applied
+
+server: $(SERVER).c
+	$(CC) -o $(SERVER) $(CCFLAGS)  $(SERVER).c -lpthread
 
 client: $(CLIENT).c
 	$(CC) -o $(CLIENT) $(CCFLAGS)  $(CLIENT).c -lpthread
