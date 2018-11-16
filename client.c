@@ -12,6 +12,31 @@
 int main(int argc , char *argv[])
 {
 
+    // Parse arguments
+    size_t i;
+    char query[128], host[20], port[20];
+    for(i = 1; i < argc && argv[i][0] == *"-"; ++i){
+	if(argv[i][1] == *"t"){
+	    strcpy(query, argv[++i]);
+	    printf("T: %s\n", query);
+	    continue;
+	}
+	else if(argv[i][1] == *"h"){
+	    strcpy(host, argv[++i]);
+	    printf("H: %s\n", host);
+	    continue;	
+	}
+	else if(argv[i][1] == *"p"){
+	    strcpy(port, argv[++i]);
+	    printf("P: %s\n", port);
+	    continue;
+        }
+	else{
+	    printf("No such option.");
+	}
+    }
+
+
     // Build up socket
     int sockfd = 0;
     sockfd = socket(AF_INET , SOCK_STREAM , 0);
