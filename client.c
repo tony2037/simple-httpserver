@@ -61,11 +61,23 @@ int main(int argc , char *argv[])
         printf("Connection error");
     }
 
+    // Build up request
+    void *request = malloc(500);
+    memset(request, 0, 500);
+    strcat((char *)request, "GET ");
+    strcat((char *)request, query);
+    strcat((char *)request, " HTTP/1.1\r\nHOST:");
+    strcat((char *)request, host);
+    strcat((char *)request, ":");
+    strcat((char *)request, port);
+    strcat((char *)request, "\r\n\r\n");
+
+    printf("reuest: %s", (char *)request);
 
     //Send a message to server
-    char message[] = {"Hi server"};
+    //char message[] = {"Hi server"};
     char receiveMessage[100] = {};
-    send(sockfd,message,sizeof(message),0);
+    send(sockfd, request, strlen(request),0);
     recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
 
     printf("%s",receiveMessage);
