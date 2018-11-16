@@ -52,8 +52,8 @@ int main(int argc , char *argv[])
     info.sin_family = PF_INET;
 
     // localhost test
-    info.sin_addr.s_addr = inet_addr("127.0.0.1");
-    info.sin_port = htons(1234);
+    info.sin_addr.s_addr = inet_addr(host);
+    info.sin_port = htons(atoi(port));
 
 
     int err = connect(sockfd,(struct sockaddr *)&info,sizeof(info));
