@@ -76,13 +76,13 @@ int main(int argc , char *argv[])
 
     //Send a message to server
     //char message[] = {"Hi server"};
-    char receiveMessage[100] = {};
+    char receiveMessage[1024] = {};
     send(sockfd, request, strlen(request),0);
     recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
 
     printf("Recieve: \n%s",receiveMessage);
-    printf("\nclose Socket\n");
-    close(sockfd);
+    if(close(sockfd) == 0)
+        printf("\nclose Socket\n");
     return 0;
 }
 
