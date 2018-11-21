@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <glob.h>
 
 struct {
     char *ext;
@@ -21,6 +22,58 @@ struct {
     {"json","application/json" },
     {0,0} };
 
+enum {
+    OK = 0,
+    BAD_REQUEST,
+    NOT_FOUND,
+    METHOD_NOT_ALLOWED,
+    UNSUPPORT_MEDIA_TYPE
+};
+
+const int status_code[] = {
+    200, // OK
+    400, // Bad Request
+    404, // Not Found
+    405, // Method Not Allowed
+    415, // Unsupported Media Type
+};
+
+void glob_dir(char *dir){
+    glob_t buf;
+    size_t i;
+    strcat(dir, "*");
+    glob(dir, GLOB_NOSORT, NULL, &buf);
+    for(i=0; i < buf.gl_pathc; ++i){
+        printf("buf.gl_pathv[%d]= %s \n", i, (buf.gl_pathv[i]));
+    }
+    globfree(&buf);
+}
+
+void responseFormat(char *response, char *Method, char *Query){
+    memset((void *) response, 0, 256); // Initialize
+    if(Method != *"GET"){
+        // 405
+    }
+
+}
+
+void handle_socket(int fd){
+    char buffer[256] = {0};
+    char response[256] = {0};
+    char *Method, *Query;
+    //char Method[8] = {0};
+    //char Query[64] = {0};
+    recv(fd, (void *)buffer, sizeof(buffer), 0);
+    strcat(response, buffer);
+    printf("Receive: \n%s", buffer);
+    // Parse
+    Method = strtok(buffer, " ");
+    Query = strtok(NULL, " ");
+    printf("Method: %s\nQuery: %s\n", Method, Query);
+
+    // Response
+    send(fd, (void *)response, sizeof(response), 0);
+}
 
 int main(int argc , char *argv[])
 
@@ -73,10 +126,12 @@ int main(int argc , char *argv[])
 
     while(1){
         forClientSockfd = accept(sockfd,(struct sockaddr *) &clientInfo, (socklen_t *) &addrlen);
+	/*
         recv(forClientSockfd,inputBuffer,sizeof(inputBuffer),0);
-        printf("Receive: %s", inputBuffer);
+        printf("Receive: \n%s", inputBuffer);
 	send(forClientSockfd,message,sizeof(message),0);
-        printf("Get:%s\n",inputBuffer);
+	*/
+	handle_socket(forClientSockfd);
     }
     return 0;
 }

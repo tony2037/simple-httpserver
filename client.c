@@ -80,8 +80,8 @@ int main(int argc , char *argv[])
     send(sockfd, request, strlen(request),0);
     recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
 
-    printf("%s",receiveMessage);
-    printf("close Socket\n");
+    printf("Recieve: \n%s",receiveMessage);
+    printf("\nclose Socket\n");
     close(sockfd);
     return 0;
 }
