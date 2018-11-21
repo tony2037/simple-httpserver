@@ -65,6 +65,12 @@ void responseFormat(char *response, char *Method, char *Query){
 	return;
     }
 
+    if(Query[0] != *"/"){
+        // 400 Bad Request
+	strcat(response, "HTTP/1.x 400 BAD_REQUEST\r\nContent-Type: \r\nServer: httpserver/1.x\r\n\r\n");
+        return;
+    }
+
 }
 
 void handle_socket(int fd){
