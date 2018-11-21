@@ -38,6 +38,14 @@ const int status_code[] = {
     415, // Unsupported Media Type
 };
 
+const char *status_info[] = {
+	"OK",
+	"BAD_REQUEST",
+	"NOT_FOUND",
+	"METHOD_NOT_ALLOWED",
+	"UNSUPPORTED_MEDIA_TYPE",
+};
+
 void glob_dir(char *dir){
     glob_t buf;
     size_t i;
@@ -52,7 +60,9 @@ void glob_dir(char *dir){
 void responseFormat(char *response, char *Method, char *Query){
     memset((void *) response, 0, 256); // Initialize
     if(Method != *"GET"){
-        // 405
+        // 405 Method Not Allowed
+	strcat(response, "HTTP/1.x 405 METHOD_NOT_ALLOWED\r\nContent-Type: \r\nServer: httpserver/1.x\r\n\r\n");
+	return;
     }
 
 }
