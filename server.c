@@ -7,9 +7,49 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+struct {
+    char *ext;
+    char *filetype;
+} extensions [] = {
+    {"htm", "text/html" },
+    {"html","text/html" },
+    {"css","text/css" },
+    {"h","text/x-h" },
+    {"hh","text/x-h" },
+    {"c","text/x-c" },
+    {"cc","text/x-c" },
+    {"json","application/json" },
+    {0,0} };
+
+
 int main(int argc , char *argv[])
 
 {
+    // Parse arguments
+    size_t i;
+    char root[128], thread_number[20], port[20];
+    for(i = 1; i < argc && argv[i][0] == *"-"; ++i){
+        if(argv[i][1] == *"r"){
+            strcpy(root, argv[++i]);
+            printf("R: %s\n", root);
+            continue;
+        }
+        else if(argv[i][1] == *"n"){
+            strcpy(thread_number, argv[++i]);
+            printf("N: %s\n", thread_number);
+            continue;
+        }
+        else if(argv[i][1] == *"p"){
+            strcpy(port, argv[++i]);
+            printf("P: %s\n", port);
+            continue;
+        }
+        else{
+            printf("No such option.");
+        }
+    }
+
+
     // Build up socket
     char inputBuffer[256] = {0};
     char message[] = {"Hi,this is server.\n"};
