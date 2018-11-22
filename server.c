@@ -49,6 +49,8 @@ const char *status_info[] = {
 void glob_dir(char *dir, char *glob_tmp){
     glob_t buf;
     size_t i;
+    if(dir[strlen(dir) -1] != *"/")
+        strcat(dir, "/");
     strcat(dir, "*");
     glob(dir, GLOB_NOSORT, NULL, &buf);
     for(i=0; i < buf.gl_pathc; ++i){
@@ -72,6 +74,7 @@ void responseFormat(char *response, char *Method, char *Query, int fd){
         fprintf(stderr, "405\n");
 	strcat(response, "HTTP/1.x 405 METHOD_NOT_ALLOWED\r\nContent-Type: \r\nServer: httpserver/1.x\r\n\r\n");
         send(fd, (void *)response, strlen(response), 0);
+	close(fd);
 	return;
     }
 
@@ -81,7 +84,8 @@ void responseFormat(char *response, char *Method, char *Query, int fd){
 	strcat(response, "HTTP/1.x 400 BAD_REQUEST\r\nContent-Type: \r\nServer: httpserver/1.x\r\n\r\n");
 	fprintf(stderr, "\nresponse:\n %s\n", response);
         send(fd, (void *)response, strlen(response), 0);
-        return;
+        close(fd);
+	return;
     }
 
     // Parsing Query
@@ -100,7 +104,7 @@ void responseFormat(char *response, char *Method, char *Query, int fd){
 
     if(i == 0){
         // root
-	char glob_result[128] = {0};
+	char glob_result[1024] = {0};
 	char dir[32] = {0};
 	strcat(dir, "./");
         glob_dir(dir, glob_result);
@@ -108,6 +112,8 @@ void responseFormat(char *response, char *Method, char *Query, int fd){
 	strcat(response, "HTTP/1.x 200 OK\r\nContent-Type: directory\r\nServer: httpserver/1.x\r\n\r\n");
 	strcat(response, glob_result);
         send(fd, (void *)response, strlen(response), 0);
+	close(fd);
+	return;
     }
     else if(i > 0){
         // several directory
@@ -120,6 +126,19 @@ void responseFormat(char *response, char *Method, char *Query, int fd){
 	if(ft == NULL){
 	    // Directory
 	    fprintf(stderr, "Directory\n");
+	    char dicPath[32] = {0};
+	    char globResult[1024] = {0};
+	    strcat(dicPath, ".");
+            strcat(dicPath, fullQuery);
+	    fprintf(stderr, "dicPath: %s\n", dicPath);
+	    glob_dir(dicPath, globResult);
+	    strcat(response, "HTTP/1.x 200 OK\r\nContent-Type: directory");
+	    strcat(response, "\r\nServer: httpserver/1.x\r\n\r\n");
+            strcat(response, globResult);
+            fprintf(stderr, "%s", response);
+            send(fd, (void *)response, strlen(response), 0);
+	    close(fd);
+	    return; 
 	}
 	else{
             // file
@@ -149,6 +168,8 @@ void responseFormat(char *response, char *Method, char *Query, int fd){
 		        // Read fault 
 	                strcat(response, "HTTP/1.x 404 NOT_FOUND\r\nContent-Type: \r\nServer: httpserver/1.x\r\n\r\n");
                         send(fd, (void *)response, strlen(response), 0);
+			close(fd);
+			return;
 		    }
 	            strcat(response, "HTTP/1.x 200 OK\r\nContent-Type: ");
 		    strcat(response, extensions[exti].filetype);
@@ -156,27 +177,37 @@ void responseFormat(char *response, char *Method, char *Query, int fd){
 		    strcat(response, chunk);
 		    fprintf(stderr, "%s", response);
                     send(fd, (void *)response, strlen(response), 0);
+		    close(fd);
+		    return;
 		}
 	        else{
 		    // No such file
 	            strcat(response, "HTTP/1.x 404 NOT_FOUND\r\nContent-Type: \r\nServer: httpserver/1.x\r\n\r\n");
                     send(fd, (void *)response, strlen(response), 0);
+		    close(fd);
+		    return;
 		}	
 	    }
 	    else{
 		fprintf(stderr, "File not support\n");
 	        strcat(response, "HTTP/1.x 415 UNSUPPORT_MEDIA_TYPE\r\nContent-Type: \r\nServer: httpserver/1.x\r\n\r\n");
                 send(fd, (void *)response, strlen(response), 0);
+		close(fd);
+		return;
 	    }
 
 	}
 	//fprintf(stderr, "\nfiletype: %s\n", ft);
 
         send(fd, (void *)response, strlen(response), 0);
+        close(fd);
+	return;
     }
 
     // Response
     send(fd, (void *)response, strlen(response), 0);
+    close(fd);
+    return;
 }
 
 void handle_socket(int fd){

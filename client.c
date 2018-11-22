@@ -9,6 +9,16 @@
 #include <arpa/inet.h>
 
 
+void parseFirstRequest(char *recvmsg){
+    char *status, *contentType, *content;
+    status = strtok(recvmsg, "\r\n");
+    contentType = strtok(NULL, "\r\n");
+    content = strtok(NULL, "\r\n");
+    content = strtok(NULL, "\r\n");
+    printf("\nstatus: %s\ncontenType: %s\ncontent: %s\n", status, contentType, content);
+}
+
+
 int main(int argc , char *argv[])
 {
 
@@ -75,14 +85,14 @@ int main(int argc , char *argv[])
     printf("reuest: %s", (char *)request);
 
     //Send a message to server
-    //char message[] = {"Hi server"};
     char receiveMessage[1024] = {};
     send(sockfd, request, strlen(request),0);
     recv(sockfd,receiveMessage,sizeof(receiveMessage),0);
 
     printf("Recieve: \n%s",receiveMessage);
-    if(close(sockfd) == 0)
-        printf("\nclose Socket\n");
+    //if(close(sockfd) == 0)
+        //printf("\nclose Socket\n");
+    parseFirstRequest(receiveMessage);
     return 0;
 }
 
