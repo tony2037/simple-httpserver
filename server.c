@@ -106,7 +106,7 @@ void responseFormat(char *response, char *Method, char *Query, int fd){
         // root
 	char glob_result[1024] = {0};
 	char dir[32] = {0};
-	strcat(dir, "./");
+	strcat(dir, "./testdic/");
         glob_dir(dir, glob_result);
         fprintf(stderr, "glob_result: %s\n", glob_result);	
 	strcat(response, "HTTP/1.x 200 OK\r\nContent-Type: directory\r\nServer: httpserver/1.x\r\n\r\n");
@@ -275,9 +275,9 @@ int main(int argc , char *argv[])
 
     serverInfo.sin_family = PF_INET;
     serverInfo.sin_addr.s_addr = INADDR_ANY;
-    serverInfo.sin_port = htons(1234);
+    serverInfo.sin_port = htons(atoi(port));
     bind(sockfd,(struct sockaddr *)&serverInfo,sizeof(serverInfo));
-    listen(sockfd,5);
+    listen(sockfd, atoi(thread_number));
 
     while(1){
         forClientSockfd = accept(sockfd,(struct sockaddr *) &clientInfo, (socklen_t *) &addrlen);
