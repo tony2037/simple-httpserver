@@ -75,6 +75,9 @@ void parseFirstRequest(char *recvmsg){
     content = strtok(NULL, "\r\n");
     printf("\nstatus: %s\ncontenType: %s\ncontent: %s\n", status, contentType, content);
 
+    if(strcmp(contentType, "Content-Type: directory") != 0)
+        return;
+
     // Parsing in secContent
     query = strtok(content, " ");
     strcpy(secContent[threadID], query+1);
